@@ -10,9 +10,12 @@ _DATE_SEPARATOR = '-'
 _MONDAY = 'Monday'
 _TUESDAY = 'Tuesday'
 _WEDNESDAY = 'Wednesday'
-_THURSDAY = 'THURSDAY'
+_THURSDAY = 'Thursday'
 _FRIDAY = 'Friday'
+_WEEKDAY = [_MONDAY, _TUESDAY, _WEDNESDAY, _THURSDAY, _FRIDAY]
 
+def _weekday_index_to_name(index):
+    return _WEEKDAY[index]
 
 def _construct_url(date):
     return 'http://swtychina.com/gb/audiodoc/{year}/{year}{month}/{year}{month}{day}.mp3'.format(
@@ -44,12 +47,12 @@ def _download_program_of_date(date, subfolder):
 
 def _download_certain_weekday_program(start_date, end_date, day):
     #TODO use a more pythonic way
-    print('==>')
+    weekday_name = _weekday_index_to_name(day)
+    print('==>downloading {} programs'.format(weekday_name))
     cur_date = start_date
     while cur_date <= end_date:
         if cur_date.weekday() == day:
-            #TODO: use weekday name as subfolder name
-            _download_program_of_date(cur_date, str(day))
+            _download_program_of_date(cur_date, weekday_name)
             cur_date += timedelta(days=7)
         else:
             cur_date += timedelta(days=1)
