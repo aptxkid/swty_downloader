@@ -5,6 +5,7 @@ import urllib
 from datetime import date, timedelta
 
 _DATE_SEPARATOR = '-'
+#TODO: use Enum instead
 _MONDAY = 'Monday'
 _TUESDAY = 'Tuesday'
 _WEDNESDAY = 'Wednesday'
@@ -34,13 +35,13 @@ def _download_program_of_date(date):
     filename = '{}_{}_{}.mp3'.format(cur_date.year, cur_date.month, cur_date.day)
     _download_file(url, filename)
 
-def _start_download(start_date, end_date, args):
+def _start_download(start_date, end_date, chosen_weekdays):
     #TODO
     pass
 
 def _extract_chosen_weekdays_from_args(args):
     if args.all_weekday:
-        return ['all weekdays']
+        return [_MONDAY, _TUESDAY, _WEDNESDAY, _THURSDAY, _FRIDAY]
     else:
         #TODO: prettify this
         chosen_weekdays = []
@@ -77,14 +78,14 @@ def main():
 
     chosen_weekdays = _extract_chosen_weekdays_from_args(args)
 
-    print('Downloading swty {} programs from {} to {}...'.format(
+    print('Downloading swty *{}* programs from {} to {}...'.format(
         ' '.join(chosen_weekdays),
         start_date,
         end_date
         )
     )
 
-    _start_download(start_date, end_date, args)
+    _start_download(start_date, end_date, chosen_weekdays)
 
 if __name__ == '__main__':
     main()
