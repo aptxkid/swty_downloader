@@ -1,6 +1,7 @@
 #!/usr/local/bin/python
 
 import argparse
+import os
 import urllib
 from datetime import date, timedelta
 
@@ -9,7 +10,7 @@ _DATE_SEPARATOR = '-'
 _MONDAY = 'Monday'
 _TUESDAY = 'Tuesday'
 _WEDNESDAY = 'Wednesday'
-_THURSDAY = 'Tuesday'
+_THURSDAY = 'THURSDAY'
 _FRIDAY = 'Friday'
 
 
@@ -32,12 +33,18 @@ def _parse_string_to_date(date_str):
 
 def _download_program_of_date(date, subfolder):
     url = _construct_url(date)
-    filename = '{}_{}_{}.mp3'.format(cur_date.year, cur_date.month, cur_date.day)
+    filename = '{}_{}_{}.mp3'.format(date.year, date.month, date.day)
+    #TODO: need to fix this ugliness
+    try:
+        os.mkdir(subfolder)
+    except OSError:
+        pass
     #TODO use os.path instead
     _download_file(url, subfolder + '/' + filename)
 
 def _download_certain_weekday_program(start_date, end_date, day):
     #TODO use a more pythonic way
+    print('==>')
     cur_date = start_date
     while cur_date <= end_date:
         if cur_date.weekday() == day:
