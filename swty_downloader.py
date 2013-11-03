@@ -1,10 +1,11 @@
 #!/usr/local/bin/python
 
+import argparse
 import urllib
 from datetime import date, timedelta
 
-cur_date = date(2007, 2, 8)
-step = timedelta(days=7)
+_DATE_SEPARATOR = '-'
+
 
 def _construct_url(date):
     return 'http://swtychina.com/gb/audiodoc/{year}/{year}{month}/{year}{month}{day}.mp3'.format(
@@ -17,10 +18,44 @@ def _download_file(url, filename):
     print('-->downloading {}'.format(filename))
     urllib.urlretrieve(url, filename)
 
+def _parse_string_to_date(date_str):
+    #TODO: add more checking about date_str format
+    date_list = date_str.split(_DATE_SEPARATOR)
+    date_list = map(int, date_list)
+    return date(*date_list)
+
+def _download_program_of_date(date):
+    url = _construct_url(date)
+    filename = '{}_{}_{}.mp3'.format(cur_date.year, cur_date.month, cur_date.day)
+    _download_file(url, filename)
+
+def _start_download(start_date, end_date, args):
+    #TODO
+    pass
+
+
+def main():
+    parser = argparse.ArgumentParser('swty downloader')
+    parser.add_argument('start_date', type=str, help='start date of downloading')
+    parser.add_argument('end_date', type=str, help='end date of downloading')
+    parser.add_argument('--mon', action='store_true', help='download Monday program')
+    parser.add_argument('--tue', action='store_true', help='download Tuesday program')
+    parser.add_argument('--wed', action='store_true', help='download Wednesday program')
+    parser.add_argument('--thu', action='store_true', help='download Thursday program')
+    parser.add_argument('--fri', action='store_true', help='download Friday program')
+    args = parser.parse_args()
+
+    if not any((args.mon, args.tue, args.wed, args.thu, args.fri)):
+        args.all_weekday = True
+    else:
+        args.all_weekday = False
+
+    start_date = _parse_string_to_date(args.start_date)
+    end_date = _parse_string_to_date(args.end_date)
+
+    print('Downloading swty from {} to {}...'.format(start_date, end_date))
+
+    _start_download(start_date, end_date, args)
+
 if __name__ == '__main__':
-    print('start downloading...')
-    while cur_date.year == 2007:
-        url = _construct_url(cur_date)
-        filename = '{}_{}_{}.mp3'.format(cur_date.year, cur_date.month, cur_date.day)
-        _download_file(url, filename)
-        cur_date += step
+    main()
