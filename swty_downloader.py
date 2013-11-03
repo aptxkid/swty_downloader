@@ -35,9 +35,13 @@ def _download_program_of_date(date):
     filename = '{}_{}_{}.mp3'.format(cur_date.year, cur_date.month, cur_date.day)
     _download_file(url, filename)
 
-def _start_download(start_date, end_date, chosen_weekdays):
+def _download_certain_weekday_program(start_date, end_date, day):
     #TODO
     pass
+
+def _start_download(start_date, end_date, chosen_weekdays):
+    for day in chosen_weekdays:
+        _download_certain_weekday_program(start_date, end_date, day)
 
 def _extract_chosen_weekdays_from_args(args):
     if args.all_weekday:
@@ -56,6 +60,21 @@ def _extract_chosen_weekdays_from_args(args):
         if args.fri:
             chosen_weekdays += [_FRIDAY]
         return chosen_weekdays
+
+def _transform_weekday_to_int(day):
+    if day == _MONDAY:
+        return 0
+    elif day == _TUESDAY:
+        return 1
+    elif day == _WEDNESDAY:
+        return 2
+    elif day == _THURSDAY:
+        return 3
+    elif day == _FRIDAY:
+        return 4
+
+def _parse_chosen_weekdays_to_standard_rep(chosen_weekdays):
+    return map(_transform_weekday_to_int, chosen_weekdays)
 
 def main():
     parser = argparse.ArgumentParser('swty downloader')
@@ -85,7 +104,9 @@ def main():
         )
     )
 
-    _start_download(start_date, end_date, chosen_weekdays)
+    chosen_weekdays_standard_rep = _parse_chosen_weekdays_to_standard_rep(chosen_weekdays)
+
+    _start_download(start_date, end_date, chosen_weekdays_standard_rep)
 
 if __name__ == '__main__':
     main()
