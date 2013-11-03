@@ -30,14 +30,22 @@ def _parse_string_to_date(date_str):
     date_list = map(int, date_list)
     return date(*date_list)
 
-def _download_program_of_date(date):
+def _download_program_of_date(date, subfolder):
     url = _construct_url(date)
     filename = '{}_{}_{}.mp3'.format(cur_date.year, cur_date.month, cur_date.day)
-    _download_file(url, filename)
+    #TODO use os.path instead
+    _download_file(url, subfolder + '/' + filename)
 
 def _download_certain_weekday_program(start_date, end_date, day):
-    #TODO
-    pass
+    #TODO use a more pythonic way
+    cur_date = start_date
+    while cur_date <= end_date:
+        if cur_date.weekday() == day:
+            #TODO: use weekday name as subfolder name
+            _download_program_of_date(cur_date, str(day))
+            cur_date += timedelta(days=7)
+        else:
+            cur_date += timedelta(days=1)
 
 def _start_download(start_date, end_date, chosen_weekdays):
     for day in chosen_weekdays:
