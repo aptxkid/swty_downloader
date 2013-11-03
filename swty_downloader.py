@@ -5,6 +5,11 @@ import urllib
 from datetime import date, timedelta
 
 _DATE_SEPARATOR = '-'
+_MONDAY = 'Monday'
+_TUESDAY = 'Tuesday'
+_WEDNESDAY = 'Wednesday'
+_THURSDAY = 'Tuesday'
+_FRIDAY = 'Friday'
 
 
 def _construct_url(date):
@@ -33,6 +38,23 @@ def _start_download(start_date, end_date, args):
     #TODO
     pass
 
+def _extract_chosen_weekdays_from_args(args):
+    if args.all_weekday:
+        return ['all weekdays']
+    else:
+        #TODO: prettify this
+        chosen_weekdays = []
+        if args.mon:
+            chosen_weekdays += [_MONDAY]
+        if args.tue:
+            chosen_weekdays += [_TUESDAY]
+        if args.wed:
+            chosen_weekdays += [_WEDNESDAY]
+        if args.thu:
+            chosen_weekdays += [_THURSDAY]
+        if args.fri:
+            chosen_weekdays += [_FRIDAY]
+        return chosen_weekdays
 
 def main():
     parser = argparse.ArgumentParser('swty downloader')
@@ -53,7 +75,14 @@ def main():
     start_date = _parse_string_to_date(args.start_date)
     end_date = _parse_string_to_date(args.end_date)
 
-    print('Downloading swty from {} to {}...'.format(start_date, end_date))
+    chosen_weekdays = _extract_chosen_weekdays_from_args(args)
+
+    print('Downloading swty {} programs from {} to {}...'.format(
+        ' '.join(chosen_weekdays),
+        start_date,
+        end_date
+        )
+    )
 
     _start_download(start_date, end_date, args)
 
