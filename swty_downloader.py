@@ -1,9 +1,10 @@
 #!/usr/local/bin/python
 
 import argparse
+import datetime
 import os
 import urllib
-from datetime import date, timedelta
+
 
 _DATE_SEPARATOR = '-'
 #TODO: use Enum instead
@@ -32,7 +33,7 @@ def _parse_string_to_date(date_str):
     #TODO: add more checking about date_str format
     date_list = date_str.split(_DATE_SEPARATOR)
     date_list = map(int, date_list)
-    return date(*date_list)
+    return datetime.date(*date_list)
 
 def _download_program_of_date(date, subfolder):
     url = _construct_url(date)
@@ -53,9 +54,9 @@ def _download_certain_weekday_program(start_date, end_date, day):
     while cur_date <= end_date:
         if cur_date.weekday() == day:
             _download_program_of_date(cur_date, weekday_name)
-            cur_date += timedelta(days=7)
+            cur_date += datetime.timedelta(days=7)
         else:
-            cur_date += timedelta(days=1)
+            cur_date += datetime.timedelta(days=1)
 
 def _start_download(start_date, end_date, chosen_weekdays):
     for day in chosen_weekdays:
