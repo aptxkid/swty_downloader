@@ -67,8 +67,7 @@ class Downloader(object):
         filename = '{}_{}_{}.mp3'.format(date.year, date.month, date.day)
         if not os.path.exists(subfolder):
             os.mkdir(subfolder)
-        #TODO use os.path instead
-        self._download_file(url, subfolder + '/' + filename)
+        self._download_file(url, os.path.join(subfolder, filename))
 
     def _construct_url(self, date):
         return 'http://swtychina.com/gb/audiodoc/{year}/{year}{month:02d}/{year}{month:02d}{day:02d}.mp3'.format(
