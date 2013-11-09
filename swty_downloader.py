@@ -65,11 +65,8 @@ class Downloader(object):
     def _download_program_of_date(self, date, subfolder):
         url = self._construct_url(date)
         filename = '{}_{}_{}.mp3'.format(date.year, date.month, date.day)
-        #TODO: need to fix this ugliness
-        try:
+        if not os.path.exists(subfolder):
             os.mkdir(subfolder)
-        except OSError:
-            pass
         #TODO use os.path instead
         self._download_file(url, subfolder + '/' + filename)
 
