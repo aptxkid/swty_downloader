@@ -19,10 +19,10 @@ def _weekday_index_to_name(index):
     return _WEEKDAY[index]
 
 def _construct_url(date):
-    return 'http://swtychina.com/gb/audiodoc/{year}/{year}{month}/{year}{month}{day}.mp3'.format(
+    return 'http://swtychina.com/gb/audiodoc/{year}/{year}{month:02d}/{year}{month:02d}{day:02d}.mp3'.format(
             year=date.year,
-            month='%02d'%(date.month,),
-            day='%02d'%(date.day,),
+            month=date.month,
+            day=date.day,
             )
 
 def _download_file(url, filename):
