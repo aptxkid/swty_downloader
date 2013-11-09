@@ -7,16 +7,39 @@ import urllib
 
 
 _DATE_SEPARATOR = '-'
-#TODO: use Enum instead
-_MONDAY = 'Monday'
-_TUESDAY = 'Tuesday'
-_WEDNESDAY = 'Wednesday'
-_THURSDAY = 'Thursday'
-_FRIDAY = 'Friday'
-_WEEKDAY = [_MONDAY, _TUESDAY, _WEDNESDAY, _THURSDAY, _FRIDAY]
 
-def _weekday_index_to_name(index):
-    return _WEEKDAY[index]
+class Weekday:
+  MONDAY = 0
+  TUESDAY = 1
+  WEDNESDAY = 2
+  THURSDAY = 3
+  FRIDAY = 4
+  SATURDAY = 5
+  SUNDAY = 6
+  WORKDAYS = [
+      MONDAY,
+      TUESDAY,
+      WEDNESDAY,
+      THURSDAY,
+      FRIDAY
+      ]
+  WEEKENDS = [
+      SATURDAY,
+      SUNDAY,
+      ]
+  WEEKDAYS = WORKDAYS + WEEKENDS
+
+
+_MAP_WEEKDAY_TO_STR = {
+      Weekday.MONDAY: 'Monday',
+      Weekday.TUESDAY: 'Tuesday',
+      Weekday.WEDNESDAY: 'Wednesday',
+      Weekday.THURSDAY: 'Thursday',
+      Weekday.FRIDAY: 'Friday',
+      Weekday.SATURDAY: 'Saturday',
+      Weekday.SUNDAY: 'Sunday',
+    }
+
 
 def _construct_url(date):
     return 'http://swtychina.com/gb/audiodoc/{year}/{year}{month:02d}/{year}{month:02d}{day:02d}.mp3'.format(
@@ -48,7 +71,7 @@ def _download_program_of_date(date, subfolder):
 
 def _download_certain_weekday_program(start_date, end_date, day):
     #TODO use a more pythonic way
-    weekday_name = _weekday_index_to_name(day)
+    weekday_name = _MAP_WEEKDAY_TO_STR[day]
     print('==>downloading {} programs'.format(weekday_name))
     cur_date = start_date
     while cur_date <= end_date:
@@ -62,38 +85,32 @@ def _start_download(start_date, end_date, chosen_weekdays):
     for day in chosen_weekdays:
         _download_certain_weekday_program(start_date, end_date, day)
 
-def _extract_chosen_weekdays_from_args(args):
-    if args.all_weekday:
-        return [_MONDAY, _TUESDAY, _WEDNESDAY, _THURSDAY, _FRIDAY]
+def _extract_chosen_workdays_from_args(args):
+    chosen_workdays = []
+    if args.mon:
+        chosen_workdays.append(Weekday.MONDAY)
+    if args.tue:
+        chosen_workdays.append(Weekday.TUESDAY) 
+    if args.wed:
+        chosen_workdays.append(Weekday.WEDNESDAY)
+    if args.thu:
+        chosen_workdays.append(Weekday.THURSDAY)
+    if args.fri:
+        chosen_workdays.append(Weekday.FRIDAY) 
+
+    if len(chosen_workdays) == 0:
+      # if none of the workdays is chosen then return all workdays
+      return Weekday.WORKDAYS
     else:
-        #TODO: prettify this
-        chosen_weekdays = []
-        if args.mon:
-            chosen_weekdays += [_MONDAY]
-        if args.tue:
-            chosen_weekdays += [_TUESDAY]
-        if args.wed:
-            chosen_weekdays += [_WEDNESDAY]
-        if args.thu:
-            chosen_weekdays += [_THURSDAY]
-        if args.fri:
-            chosen_weekdays += [_FRIDAY]
-        return chosen_weekdays
+      return chosen_workdays
 
-def _transform_weekday_to_int(day):
-    if day == _MONDAY:
-        return 0
-    elif day == _TUESDAY:
-        return 1
-    elif day == _WEDNESDAY:
-        return 2
-    elif day == _THURSDAY:
-        return 3
-    elif day == _FRIDAY:
-        return 4
-
-def _parse_chosen_weekdays_to_standard_rep(chosen_weekdays):
-    return map(_transform_weekday_to_int, chosen_weekdays)
+def _print_download_title(start_date, end_date, chosen_workdays):
+    print('Downloading swty *{}* programs from {} to {}...'.format(
+        ' '.join(map(lambda wd:_MAP_WEEKDAY_TO_STR[wd] ,chosen_workdays)),
+        start_date,
+        end_date
+        )
+    )
 
 def main():
     parser = argparse.ArgumentParser('swty downloader')
@@ -106,26 +123,12 @@ def main():
     parser.add_argument('--fri', action='store_true', help='download Friday program')
     args = parser.parse_args()
 
-    if not any((args.mon, args.tue, args.wed, args.thu, args.fri)):
-        args.all_weekday = True
-    else:
-        args.all_weekday = False
-
     start_date = _parse_string_to_date(args.start_date)
     end_date = _parse_string_to_date(args.end_date)
+    chosen_workdays = _extract_chosen_workdays_from_args(args)
+    _print_download_title(start_date, end_date, chosen_workdays)
 
-    chosen_weekdays = _extract_chosen_weekdays_from_args(args)
-
-    print('Downloading swty *{}* programs from {} to {}...'.format(
-        ' '.join(chosen_weekdays),
-        start_date,
-        end_date
-        )
-    )
-
-    chosen_weekdays_standard_rep = _parse_chosen_weekdays_to_standard_rep(chosen_weekdays)
-
-    _start_download(start_date, end_date, chosen_weekdays_standard_rep)
+    _start_download(start_date, end_date, chosen_workdays)
 
 if __name__ == '__main__':
     main()
