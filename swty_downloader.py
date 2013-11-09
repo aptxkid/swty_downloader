@@ -51,17 +51,22 @@ class Downloader(object):
         for day in self._chosen_days:
             self._download_certain_weekday_programs(day)
 
-    def _download_certain_weekday_programs(self, day):
-        #TODO use a more pythonic way
-        weekday_name = _MAP_WEEKDAY_TO_STR[day]
-        print('==>downloading {} programs'.format(weekday_name))
+    def _date_range(self):
         cur_date = self._start_date
         while cur_date <= self._end_date:
-            if cur_date.weekday() == day:
-                self._download_program_of_date(cur_date, weekday_name)
-                cur_date += datetime.timedelta(days=7)
-            else:
-                cur_date += datetime.timedelta(days=1)
+            yield cur_date
+            cur_date += datetime.timedelta(days=1)
+
+    def _weekday(self, weekday):
+        for date in self._date_range():
+            if date.weekday() == weekday:
+                yield date
+
+    def _download_certain_weekday_programs(self, day):
+        weekday_name = _MAP_WEEKDAY_TO_STR[day]
+        print('==>downloading {} programs'.format(weekday_name))
+        for date in self._weekday(day):
+            self._download_program_of_date(date, weekday_name)
 
     def _download_program_of_date(self, date, subfolder):
         url = self._construct_url(date)
