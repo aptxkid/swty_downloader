@@ -40,50 +40,55 @@ _MAP_WEEKDAY_TO_STR = {
       Weekday.SUNDAY: 'Sunday',
     }
 
+class Downloader(object):
+    def __init__(self, start_date, end_date, chosen_days):
+        self._start_date = start_date
+        self._end_date = end_date
+        self._chosen_days = chosen_days
 
-def _construct_url(date):
-    return 'http://swtychina.com/gb/audiodoc/{year}/{year}{month:02d}/{year}{month:02d}{day:02d}.mp3'.format(
-            year=date.year,
-            month=date.month,
-            day=date.day,
-            )
+    def start(self):
+        for day in self._chosen_days:
+            self._download_certain_weekday_programs(day)
 
-def _download_file(url, filename):
-    print('-->downloading {}'.format(filename))
-    urllib.urlretrieve(url, filename)
+    def _download_certain_weekday_programs(self, day):
+        #TODO use a more pythonic way
+        weekday_name = _MAP_WEEKDAY_TO_STR[day]
+        print('==>downloading {} programs'.format(weekday_name))
+        cur_date = self._start_date
+        while cur_date <= self._end_date:
+            if cur_date.weekday() == day:
+                self._download_program_of_date(cur_date, weekday_name)
+                cur_date += datetime.timedelta(days=7)
+            else:
+                cur_date += datetime.timedelta(days=1)
+
+    def _download_program_of_date(self, date, subfolder):
+        url = self._construct_url(date)
+        filename = '{}_{}_{}.mp3'.format(date.year, date.month, date.day)
+        #TODO: need to fix this ugliness
+        try:
+            os.mkdir(subfolder)
+        except OSError:
+            pass
+        #TODO use os.path instead
+        self._download_file(url, subfolder + '/' + filename)
+
+    def _construct_url(self, date):
+        return 'http://swtychina.com/gb/audiodoc/{year}/{year}{month:02d}/{year}{month:02d}{day:02d}.mp3'.format(
+                year=date.year,
+                month=date.month,
+                day=date.day,
+                )
+
+    def _download_file(self, url, filepath):
+        print('-->downloading {}'.format(filepath))
+        urllib.urlretrieve(url, filepath)
 
 def _parse_string_to_date(date_str):
     #TODO: add more checking about date_str format
     date_list = date_str.split(_DATE_SEPARATOR)
     date_list = map(int, date_list)
     return datetime.date(*date_list)
-
-def _download_program_of_date(date, subfolder):
-    url = _construct_url(date)
-    filename = '{}_{}_{}.mp3'.format(date.year, date.month, date.day)
-    #TODO: need to fix this ugliness
-    try:
-        os.mkdir(subfolder)
-    except OSError:
-        pass
-    #TODO use os.path instead
-    _download_file(url, subfolder + '/' + filename)
-
-def _download_certain_weekday_program(start_date, end_date, day):
-    #TODO use a more pythonic way
-    weekday_name = _MAP_WEEKDAY_TO_STR[day]
-    print('==>downloading {} programs'.format(weekday_name))
-    cur_date = start_date
-    while cur_date <= end_date:
-        if cur_date.weekday() == day:
-            _download_program_of_date(cur_date, weekday_name)
-            cur_date += datetime.timedelta(days=7)
-        else:
-            cur_date += datetime.timedelta(days=1)
-
-def _start_download(start_date, end_date, chosen_weekdays):
-    for day in chosen_weekdays:
-        _download_certain_weekday_program(start_date, end_date, day)
 
 def _extract_chosen_workdays_from_args(args):
     chosen_workdays = []
@@ -128,7 +133,8 @@ def main():
     chosen_workdays = _extract_chosen_workdays_from_args(args)
     _print_download_title(start_date, end_date, chosen_workdays)
 
-    _start_download(start_date, end_date, chosen_workdays)
+    downloader = Downloader(start_date, end_date, chosen_workdays)
+    downloader.start()
 
 if __name__ == '__main__':
     main()
