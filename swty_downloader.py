@@ -3,10 +3,11 @@
 import argparse
 import datetime
 import os
+import re
 import urllib
 
-
-_DATE_SEPARATOR = '-'
+class NotMatchingDateFormatException(Exception):
+    pass
 
 class Weekday:
   MONDAY = 0
@@ -81,8 +82,11 @@ class Downloader(object):
         urllib.urlretrieve(url, filepath)
 
 def _parse_string_to_date(date_str):
-    #TODO: add more checking about date_str format
-    date_list = date_str.split(_DATE_SEPARATOR)
+    re_parttern = '\d{4}-\d{1,2}-\d{1,2}'
+    if not re.match(re_parttern, date_str):
+        raise NotMatchingDateFormatException(
+                'The format of date {} does not match the re patten {}'.format(date_str, re_parttern))
+    date_list = date_str.split('-')
     date_list = map(int, date_list)
     return datetime.date(*date_list)
 
