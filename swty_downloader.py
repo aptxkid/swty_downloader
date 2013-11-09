@@ -135,6 +135,7 @@ def main():
 
     start_date = _parse_string_to_date(args.start_date)
     end_date = _parse_string_to_date(args.end_date)
+    assert start_date <= end_date, 'The start date must be before or equal to the end date'
     chosen_workdays = _extract_chosen_workdays_from_args(args)
     _print_download_title(start_date, end_date, chosen_workdays)
 
