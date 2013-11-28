@@ -10,24 +10,9 @@ class NotMatchingDateFormatException(Exception):
     pass
 
 class Weekday:
-  MONDAY = 0
-  TUESDAY = 1
-  WEDNESDAY = 2
-  THURSDAY = 3
-  FRIDAY = 4
-  SATURDAY = 5
-  SUNDAY = 6
-  WORKDAYS = [
-      MONDAY,
-      TUESDAY,
-      WEDNESDAY,
-      THURSDAY,
-      FRIDAY
-      ]
-  WEEKENDS = [
-      SATURDAY,
-      SUNDAY,
-      ]
+  MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY = range(7)
+  WORKDAYS = [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY]
+  WEEKENDS = [SATURDAY, SUNDAY]
   WEEKDAYS = WORKDAYS + WEEKENDS
 
 
