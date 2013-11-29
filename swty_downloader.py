@@ -9,6 +9,7 @@ import urllib
 class NotMatchingDateFormatException(Exception):
     pass
 
+#TODO: Following two blocks can be simplified by using calendar module
 class Weekday:
   MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY = range(7)
   WORKDAYS = [MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY]
