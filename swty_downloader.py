@@ -43,15 +43,10 @@ class Downloader(object):
             yield cur_date
             cur_date += datetime.timedelta(days=1)
 
-    def _weekday(self, weekday):
-        for date in self._date_range():
-            if date.weekday() == weekday:
-                yield date
-
     def _download_certain_weekday_programs(self, day):
         weekday_name = _MAP_WEEKDAY_TO_STR[day]
         print('==>downloading {} programs'.format(weekday_name))
-        for date in self._weekday(day):
+        for date in (date for date in self._date_range() if date.weekday() == day):
             self._download_program_of_date(date, weekday_name)
 
     def _download_program_of_date(self, date, subfolder):
